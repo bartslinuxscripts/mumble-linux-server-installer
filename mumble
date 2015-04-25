@@ -1,0 +1,77 @@
+#!/bin/bash
+clear
+releaseOS=$(gawk -F= '/^NAME/{print $2}' /etc/os-release)
+serverRunning=$(ps cax | grep murmur.x86)
+osRoot="apt"
+if [ -d ~/.mumble ]; then
+    if [[ $serverRunning == *"murmur.x86"* ]]; then
+      while true; do
+        read -p "   Mumble Server is already running. Do you want to stop it? [y/n]" yn
+        case $yn in
+          [Yy]* ) pkill murmur.x86; echo -e "\033[32m   Server has been stopped.\033[37m"; break;;
+          [Nn]* ) exit;;
+          * ) echo "Please answer yes or no."
+        esac
+      done
+    else
+      echo -e "\033[32m   Server has been started.\033[37m"
+      ~/.mumble/murmur-static_x86-1.2.8/murmur.x86
+    fi
+  exit
+fi
+echo -e "\033[37m"
+echo " ╔═══════════════════════════════════════════════════════╗"
+echo " ║ Bart's Linux Tutorials ║ Mumble Server Installer      ║"
+echo " ╚═══════════════════════════════════════════════════════╝"
+echo " ╔═══════════════════════════════════════════════════════╗"
+echo -e " ║ ! ║                 Use \033[32m./mumble \033[37mto start/stop server ║"
+echo " ╚═══════════════════════════════════════════════════════╝"
+echo " "
+echo -e " * Checking if Fedora / CentOS / Debian / Ubuntu.."
+if [ $releaseOS == "Fedora" ]; then
+  echo -e "\033[32m   Fedora"
+  echo -e "\033[37m"
+  osRoot="yum"
+elif [ $releaseOS == "CentOS" ]; then
+  echo -e "\033[32m   CentOS"
+  echo -e "\033[37m"
+  osRoot="yum"
+elif [ $releaseOS == "Debian" ]; then
+  echo -e "\033[32m   Debian"
+  echo -e "\033[37m"
+  osRoot="apt"
+elif [ $releaseOS == "Ubuntu" ]; then
+  echo -e "\033[32m   Ubuntu"
+  echo -e "\033[37m"
+  osRoot="apt"
+else
+  echo -e "\033[31m   Unsupported :("
+  exit
+fi
+
+echo -e " * Checking if wget is installed.. "
+if [ $osRoot == "yum" ]; then
+  yum -y install wget > /dev/null
+elif [ $osRoot == "apt" ]; then
+  apt-get -y install wget > /dev/null
+fi
+echo -e "\033[32m   Done!"
+echo -e "\033[37m"
+echo -e " * Creating install directory.. "
+mkdir ~/.mumble
+echo -e "\033[32m   Done!"
+echo -e "\033[37m"
+echo -e " * Downloading Mumble Server.. "
+cd ~/.mumble
+wget -q 'http://sourceforge.net/projects/mumble/files/Mumble/1.2.8/murmur-static_x86-1.2.8.tar.bz2/download'
+echo -e "\033[32m   Done!"
+echo -e "\033[37m"
+echo -e " * Unpacking server files.. "
+tar -jxf download
+rm download
+echo -e "\033[32m   Done!"
+echo -e "\033[37m"
+echo -e " * Starting server for the first time.. "
+~/.mumble/murmur-static_x86-1.2.8/murmur.x86
+echo -e "\033[32m   Done!"
+echo -e "\033[37m"
